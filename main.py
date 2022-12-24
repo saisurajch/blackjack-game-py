@@ -1,81 +1,57 @@
-import random
-
-#created a function for generating random cards
-def deal_card():
-    """Returns a random card from the deck"""
-    cards = [11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10]
-    return random.choice(cards)
-
-#created a function that takes list of cards as input and returns the sum as score
-def calculate_score(cards):
-    """Takes list of cards as inputs and returns the score"""
-    if sum(cards) == 21 and len(cards) == 2:
-        return 0
-    if 11 in cards and sum(cards)>21:
-        cards.remove(11)
-        cards.append(1)
-    return sum(cards)
-
-#created a compare function which compares the scores of user and computer
-def compare(user_score, computer_score):
-    if user_score == computer_score:
-        return "Draw"
-    elif computer_score == 0:
-        return "You Lose...! Opponent has a blackjack"
-    elif user_score == 0:
-        return "You Win with a blackjack"
-    elif user_score > 21:
-        return "You went over...! You Lose"
-    elif computer_score > 21:
-        return "Opponent went over...! You Win"
-    elif user_score > computer_score:
-        return "You win...!"
+from random import choices
+main_cards=[11,1,2,3,4,5,6,7,8,9,10,10,10]
+computer_cards=[]
+user_cards=[]
+temp=0
+def winner():
+    global user_cards
+    global computer_cards
+    global temp
+    if sum(computer_cards)>=21:
+        print('computer_wins')
+        return ('computer_wins',1)
+    elif sum(user_cards)>=21:
+        return ('user_wins',1)
+    elif sum(computer_cards)>sum(user_cards) and temp==1:
+        print('computer_wins')
+        return ('computer_wins', 1)
+    elif sum(user_cards) > sum(computer_cards) and temp==1:
+        print('user_wins')
+        return ('user_wins', 1)
     else:
-        return "You Lose"
-playgame = True
-def game():
-    #declaring an empty list for both user and computer to hold cards
-    user_cards = []
-    computer_cards = []
-    is_game_over = False
-    #appending 2 default cards for both user and computer as a start
-    for i in range(0,2):
-        user_cards.append(deal_card())
-        computer_cards.append((deal_card()))
+        return ('not_declared_yet',0)
 
-    #calling the calculate_score function by passing user_cards and computer_cards as list inputs
-    user_score = calculate_score(user_cards)
-    computer_score = calculate_score(computer_cards)
-
-    #creating a while loop for user choices
-    while is_game_over == False:
-        #displaying the cards and score at start
-        print(f"Your cards : {user_cards}, present score : {user_score}")
-        print(f"Computer's first card : {computer_cards[0]}")
-
-        #making conditions for deciding win or lose
-        if user_score == 0 or computer_score == 0 or user_score>21:
-            is_game_over = True
-        else:
-            user_choice = input("Do you want to draw another card...! Type 'y' for yes and 'n' for pass :")
-            if(user_choice == 'y'):
-                user_cards.append(deal_card())
-                user_score = sum(user_cards)
-            else:
-                is_game_over = True
-
-    #creating a while loop for computer choices
-    while computer_score != 0 and computer_score<17:
-        computer_cards.append(deal_card())
-        computer_score = calculate_score(computer_cards)
-
-    #last part
-    print(f"Your Final hand:: Cards: {user_cards} Final Score: {user_score}")
-    print(f"Computer's Final hand:: Cards: {computer_cards} Final Score: {computer_score}")
-    print(compare(user_score, computer_score))
-    play_game = input("Do you want to play the game again? Type 'y' for yes and other char for exit :")
-    if play_game == 'y':
+def decision(choice):
+    global temp
+    if choice == 'y':
+        temp = 1
+        pick_cards(user_cards, 1)
+        pick_cards(computer_cards, 1)
         game()
-    else:
-        print("Game End")
-game()
+    elif choice == 'n':
+        temp = 1
+        pick_cards(computer_cards, 1)
+        game()
+
+def pick_cards(cards,ch):
+    global main_cards
+    for i in choices(main_cards,k=ch):
+        if (11 in cards and i==11):
+            cards.append(1)
+        else:
+            cards.append(i)
+    return cards
+
+def game():
+    global temp
+    if 0 in winner():
+        print("computer cards are", computer_cards[0])
+        print("your cards: ", user_cards, "your score is", sum(user_cards))
+        choice=input("Do you want to draw another card...! Type 'y' for yes and 'n' for pass :")
+        decision(choice)
+
+computer_cards=pick_cards(computer_cards,2)
+user_cards=pick_cards(user_cards,2)
+if 0 in winner():
+    game()
+
